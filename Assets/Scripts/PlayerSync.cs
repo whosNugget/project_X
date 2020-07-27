@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using Photon.Pun;
+using UnityEditor.Experimental.TerrainAPI;
 
 public class PlayerSync : MonoBehaviourPun, IPunObservable
 {
