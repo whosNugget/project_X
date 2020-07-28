@@ -2,6 +2,9 @@
 using UnityEngine;
 using Photon.Pun;
 using Photon.Realtime;
+using System.Collections;
+using UnityEditor;
+using UnityEngine.SceneManagement;
 
 public class GameLobby : MonoBehaviourPunCallbacks
 {
@@ -9,6 +12,9 @@ public class GameLobby : MonoBehaviourPunCallbacks
 	[SerializeField] string appVersion = "0.0";
 	[SerializeField] string roomName = "Room 1";
 	[SerializeField] string sceneName = "SceneName";
+
+	[SerializeField] ServerSelect serverSelectUI = null;
+
 	List<RoomInfo> createdRooms = new List<RoomInfo>();
 	Vector2 roomListScroll = Vector2.zero;
 	bool joiningRoom = false;
@@ -23,49 +29,86 @@ public class GameLobby : MonoBehaviourPunCallbacks
 		}
 	}
 
-	private void OnGUI()
+	public void CreateRoom(string roomName)
 	{
-		
+		joiningRoom = true;
+
+		RoomOptions roomOptions = new RoomOptions()
+		{
+			IsOpen = true,
+			IsVisible = true,
+			MaxPlayers = 10,
+		};
+
+		PhotonNetwork.NickName = playerName;
+		PhotonNetwork.JoinOrCreateRoom(roomName, roomOptions, TypedLobby.Default);
+	}
+
+	public void JoinRoom(string roomName)
+	{
+		if (!string.IsNullOrWhiteSpace(roomName))
+		{
+			joiningRoom = true;
+			PhotonNetwork.NickName = playerName;
+			PhotonNetwork.JoinRoom(roomName);
+		}
+	}
+
+	public void UpdatePlayerName(string newName)
+	{
+		playerName = string.IsNullOrWhiteSpace(newName) ? "Player1" : newName;
+	}
+
+	public void RefreshList()
+	{
+		if (PhotonNetwork.IsConnected) PhotonNetwork.JoinLobby(TypedLobby.Default);
+		else PhotonNetwork.ConnectUsingSettings();
 	}
 
 	public override void OnConnectedToMaster()
 	{
-		
+		Debug.Log("Connected to master!");
+		PhotonNetwork.JoinLobby();
 	}
 
 	public override void OnRoomListUpdate(List<RoomInfo> roomList)
 	{
 		createdRooms = roomList;
+		StartCoroutine(serverSelectUI.UpdateRoomList(createdRooms));
 	}
 
 	public override void OnJoinedRoom()
 	{
-		
+		Debug.Log("Created a room successfully");
+		PhotonNetwork.NickName = playerName;
+		PhotonNetwork.LoadLevel(sceneName);
 	}
 
 	public override void OnCreatedRoom()
 	{
-		
+		Debug.Log("Created a room successfully");
+		PhotonNetwork.NickName = playerName;
+		PhotonNetwork.LoadLevel(sceneName);
 	}
 
 	public override void OnCreateRoomFailed(short returnCode, string message)
 	{
-		
+		Debug.LogWarning($"Failed to create a room\nCode: {returnCode}; Message: {message}");
 	}
 
 	public override void OnJoinRoomFailed(short returnCode, string message)
 	{
-		
+		Debug.LogWarning($"Failed to join a room\nCode: {returnCode}; Message: {message}");
 	}
 
 	public override void OnJoinRandomFailed(short returnCode, string message)
 	{
-		
+		Debug.LogWarning($"Faild to join a random room\nCode: {returnCode}; Message: {message}");
 	}
 
 	public override void OnDisconnected(DisconnectCause cause)
 	{
-		Debug.LogError($"Failed to connect to photon... Status: {cause.ToString()}\nServer Address: <color=red>{PhotonNetwork.ServerAddress}</color>");
+		Debug.LogWarning($"Disconnect event ocurred... Status: {cause}\nServer Address: <color=red>{PhotonNetwork.ServerAddress}</color>");
 	}
 }
 
@@ -135,7 +178,11 @@ public class GameLobby : MonoBehaviourPunCallbacks
 //		{
 //			for (int i = 0; i < createdRooms.Count; i++)
 //			{
-//				GUILayout.BeginHorizontal("box"); GUILayout.Label(createdRooms[i].Name, GUILayout.Width(400)); GUILayout.Label(createdRooms[i].PlayerCount + "/" + createdRooms[i].MaxPlayers); GUILayout.FlexibleSpace(); if (GUILayout.Button("Join Room"))
+//				GUILayout.BeginHorizontal("box"); 
+//				GUILayout.Label(createdRooms[i].Name, GUILayout.Width(400)); 
+//				GUILayout.Label(createdRooms[i].PlayerCount + "/" + createdRooms[i].MaxPlayers);
+//				GUILayout.FlexibleSpace();
+//				if (GUILayout.Button("Join Room"))
 //				{
 //					joiningRoom = true;
 //					PhotonNetwork.NickName = playerName; // set player name

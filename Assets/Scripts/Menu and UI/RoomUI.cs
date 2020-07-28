@@ -1,7 +1,8 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using Photon.Pun;
+using Photon.Realtime;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class RoomUI : MonoBehaviour
 {
@@ -11,15 +12,26 @@ public class RoomUI : MonoBehaviour
 	[Space]
 	[SerializeField] string roomName = "";
 	[SerializeField] int currentPlayers = 0;
-	[SerializeField] int maxPlayers = 0;
+	[SerializeField] byte maxPlayers = 0;
+
+	public RoomOptions RoomSettings { get; } = new RoomOptions();
 
 	//TODO Error checking
 	public string RoomName { get { return roomName; } set { roomName = value; UpdateLabels(); } }
 	public int CurrentPlayers { get { return currentPlayers; }  set { currentPlayers = value; UpdateLabels(); } }
-	public int MaxPlayers { get { return maxPlayers; } set { maxPlayers = value; UpdateLabels(); } }
+	public byte MaxPlayers { get { return maxPlayers; } set { maxPlayers = value; UpdateLabels(); } }
 
-	public void SetLabels(string roomName, int maxPlayers, int currentPlayers = 0)
+	private void Awake()
 	{
+		GetComponentInChildren<Button>().onClick.AddListener(JoinRoom);
+	}
+
+	public void SetLabels(string roomName, byte maxPlayers, int currentPlayers = 0)
+	{
+		RoomSettings.IsOpen = true;
+		RoomSettings.IsVisible = true;
+		RoomSettings.MaxPlayers = maxPlayers;
+
 		this.roomName = roomName;
 		this.currentPlayers = currentPlayers;
 		this.maxPlayers = maxPlayers;
@@ -29,7 +41,14 @@ public class RoomUI : MonoBehaviour
 	private void OnValidate() => UpdateLabels();
 	private void UpdateLabels()
 	{
+		RoomSettings.MaxPlayers = maxPlayers;
+
 		roomNameLabel.text = roomName;
 		playerCountLabel.text = $"{currentPlayers}/{maxPlayers}";
+	}
+
+	public void JoinRoom()
+	{
+		PhotonNetwork.JoinRoom(roomName);
 	}
 }
