@@ -2717,7 +2717,7 @@ MonoBehaviour:
   playerName: Player1
   appVersion: 0.0
   roomName: Room 1
-  sceneName: SceneName
+  sceneName: Game
   serverSelectUI: {fileID: 169159273}
 --- !u!4 &1040648001
 Transform:

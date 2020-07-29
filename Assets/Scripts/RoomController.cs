@@ -6,11 +6,12 @@ public class RoomController : MonoBehaviourPunCallbacks
 	// player instance prefab, must be located in the Resources folder 
 	[SerializeField] GameObject m_playerPrefab;    // player spawn point  
 	[SerializeField] Transform m_spawnPoint;
+	[SerializeField] bool devMode = false;
 
 	void Start()
 	{
-		// in case we started this scene with the wrong scene being active, simply load the menu scene 
-		if (PhotonNetwork.CurrentRoom == null)
+		// in case we started this scene with the wrong scene being active, simply load the menu scene only when the room controller is not in dev mode
+		if (PhotonNetwork.CurrentRoom == null && !devMode)
 		{
 			Debug.Log("Is not in the room, returning back to Lobby");
 			UnityEngine.SceneManagement.SceneManager.LoadScene("GameLobby");

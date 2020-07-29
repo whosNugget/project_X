@@ -44,16 +44,6 @@ public class GameLobby : MonoBehaviourPunCallbacks
 		PhotonNetwork.JoinOrCreateRoom(roomName, roomOptions, TypedLobby.Default);
 	}
 
-	public void JoinRoom(string roomName)
-	{
-		if (!string.IsNullOrWhiteSpace(roomName))
-		{
-			joiningRoom = true;
-			PhotonNetwork.NickName = playerName;
-			PhotonNetwork.JoinRoom(roomName);
-		}
-	}
-
 	public void UpdatePlayerName(string newName)
 	{
 		playerName = string.IsNullOrWhiteSpace(newName) ? "Player1" : newName;
@@ -79,15 +69,13 @@ public class GameLobby : MonoBehaviourPunCallbacks
 
 	public override void OnJoinedRoom()
 	{
-		Debug.Log("Created a room successfully");
+		Debug.Log("Joined a room successfully");
 		PhotonNetwork.NickName = playerName;
-		PhotonNetwork.LoadLevel(sceneName);
 	}
 
 	public override void OnCreatedRoom()
 	{
 		Debug.Log("Created a room successfully");
-		PhotonNetwork.NickName = playerName;
 		PhotonNetwork.LoadLevel(sceneName);
 	}
 
