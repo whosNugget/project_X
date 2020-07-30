@@ -17,7 +17,7 @@ public class BumperWall : MonoBehaviour
 
 	private void OnCollisionEnter(Collision collision)
 	{
-		Debug.Log("Collision occurred: " + collision.gameObject.name);
+		//Debug.Log("Collision occurred: " + collision.gameObject.name);
 
 		if (collision.gameObject.CompareTag(collisionTag))
 		{

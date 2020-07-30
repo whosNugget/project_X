@@ -1,12 +1,28 @@
-﻿using UnityEngine;
+﻿using Photon.Pun;
+using UnityEngine;
 
-public class PlayerController : MonoBehaviour
+public class PlayerController : MonoBehaviourPunCallbacks
 {
-	[SerializeField] float m_speed = 5.0f;
+	[SerializeField] float speed = 5.0f;
+
+	Rigidbody rb = null;
+
+	private void Awake()
+	{
+		rb = GetComponent<Rigidbody>();
+	}
 
 	void Update()
 	{
-		transform.Translate(Input.GetAxis("Vertical") * transform.forward * m_speed * Time.deltaTime);
-		transform.Translate(Input.GetAxis("Horizontal") * transform.right * m_speed * Time.deltaTime);
+		if (photonView.IsMine)
+		{
+			Vector3 delta = new Vector3
+			{
+				x = Input.GetAxis("Horizontal"),
+				z = Input.GetAxis("Vertical"),
+			} * speed;
+
+			rb.AddRelativeForce(delta);
+		}
 	}
 }
