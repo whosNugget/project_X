@@ -18,7 +18,7 @@ public class PlayerController : MonoBehaviour
 		{
 			Vector3 dir = collision.contacts[0].point - transform.position;
 			dir = -dir.normalized;
-			collision.gameObject.GetComponent<Rigidbody>().AddForce(-dir * force);
+			collision.gameObject.GetComponent<Rigidbody>().AddForce(dir * force);
 		}
 	}
 }
