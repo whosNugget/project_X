@@ -35,4 +35,17 @@ public class PlayerController : MonoBehaviourPunCallbacks
 			//if (ui.Lives != lives) ui.Lives = lives;
 		}
 	}
+
+	private void OnCollisionEnter(Collision collision)
+	{
+		float force = 500;
+		
+		if (collision.gameObject.tag == "Player")
+		{
+			var contact = collision.contacts[0];
+			Vector3 dir = contact.point - transform.position;
+			dir = -dir.normalized;
+			collision.gameObject.GetComponent<Rigidbody>().AddForce(dir * force);
+		}
+	}
 }
