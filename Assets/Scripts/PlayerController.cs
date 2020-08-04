@@ -34,10 +34,15 @@ public class PlayerController : MonoBehaviourPun, IPunObservable
 				z = Input.GetAxis("Vertical"),
 			}.normalized * speed;
 
+			rb.drag = delta.sqrMagnitude > 0f ? 0f : 5f;
 			rb.AddRelativeForce(delta);
 
 			//if (ui.Lives != lives) ui.Lives = lives;
 		}
+
+		float vertical = rb.velocity.y;
+		rb.velocity = Vector3.ClampMagnitude(rb.velocity, 20f);
+		rb.velocity = new Vector3 { x = rb.velocity.x, y = vertical, z = rb.velocity.z };
 	}
 
 	private void OnCollisionEnter(Collision collision)
@@ -64,11 +69,13 @@ public class PlayerController : MonoBehaviourPun, IPunObservable
 		{
 			stream.SendNext(transform.position);
 			stream.SendNext(rb.velocity);
+			stream.SendNext(rb.drag);
 		}
 		else
 		{
 			transform.position = (Vector3)stream.ReceiveNext();
 			rb.velocity = (Vector3)stream.ReceiveNext();
+			rb.drag = (float)stream.ReceiveNext();
 		}
 	}
 }

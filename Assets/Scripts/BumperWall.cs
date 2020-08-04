@@ -23,6 +23,7 @@ public class BumperWall : MonoBehaviour
 		{
 			//Collided with a rigidbody/collider of the specified mask
 			rb.isKinematic = false;
+			collision.gameObject.GetComponent<Rigidbody>().velocity *= -1;
 		}
 	}
 }

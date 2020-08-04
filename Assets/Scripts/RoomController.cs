@@ -57,6 +57,10 @@ public class RoomController : MonoBehaviourPunCallbacks
 
 			StartCoroutine(Countdown(toRespawn));
 		}
+		else
+		{
+			toRespawn.gameObject.SetActive(false);
+		}
 	}
 	IEnumerator Countdown(PlayerController toRespawn)
 	{

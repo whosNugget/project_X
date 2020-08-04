@@ -12,9 +12,13 @@ public class PlayableBounds : MonoBehaviour
 		localPlayerUI = FindObjectOfType<GameUI>();
 	}
 
-	private void OnTriggerExit(Collider other)
+	private void OnTriggerEnter(Collider other)
 	{
+		Debug.Log("Entered bounds: " + other.gameObject.name);
+
 		if (other.CompareTag("Player"))
-			other.gameObject.GetComponent<PlayerController>().lives--;
+			activeController.RespawnPlayer(other.gameObject.GetComponent<PlayerController>());
+		else
+			other.gameObject.SetActive(false);
 	}
 }
