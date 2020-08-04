@@ -5,6 +5,10 @@ public class PlayerController : MonoBehaviourPunCallbacks
 {
 	[SerializeField] float speed = 5.0f;
 	[SerializeField] int totalLives = 3;
+	[SerializeField] float bumpForce = 35f;
+	[SerializeField, Range(0, 1)] float selfBumpFactor = .35f;
+
+	[SerializeField] bool overrideControl;
 
 	[HideInInspector] public int lives;
 
@@ -22,13 +26,13 @@ public class PlayerController : MonoBehaviourPunCallbacks
 
 	void Update()
 	{
-		if (photonView.IsMine)
+		if (photonView.IsMine || overrideControl)
 		{
 			Vector3 delta = new Vector3
 			{
 				x = Input.GetAxis("Horizontal"),
 				z = Input.GetAxis("Vertical"),
-			} * speed;
+			}.normalized * speed;
 
 			rb.AddRelativeForce(delta);
 
@@ -38,14 +42,19 @@ public class PlayerController : MonoBehaviourPunCallbacks
 
 	private void OnCollisionEnter(Collision collision)
 	{
-		float force = 500;
-		
-		if (collision.gameObject.tag == "Player")
+		if (collision.gameObject.CompareTag("Player"))
 		{
-			var contact = collision.contacts[0];
-			Vector3 dir = contact.point - transform.position;
-			dir = -dir.normalized;
-			collision.gameObject.GetComponent<Rigidbody>().AddForce(dir * force);
+			Vector3 transformCenter = transform.position + Vector3.up;
+			Vector3 collisionTransformCenter = collision.transform.position + Vector3.up;
+
+			Vector3 otherBumpForce = (collisionTransformCenter - transformCenter).normalized * bumpForce;
+			Vector3 selfBumpForce = -otherBumpForce * selfBumpFactor;
+
+			Debug.DrawRay(transformCenter, selfBumpForce, Color.red);
+			Debug.DrawRay(collisionTransformCenter, otherBumpForce, Color.green);
+
+			rb.AddRelativeForce(selfBumpForce, ForceMode.Impulse);
+			collision.gameObject.GetComponent<Rigidbody>().AddRelativeForce(otherBumpForce, ForceMode.Impulse);
 		}
 	}
 }
