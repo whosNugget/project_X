@@ -1,7 +1,7 @@
 ﻿using Photon.Pun;
 using UnityEngine;
 
-public class PlayerController : MonoBehaviourPunCallbacks
+public class PlayerController : MonoBehaviourPun, IPunObservable
 {
 	[SerializeField] float speed = 5.0f;
 	[SerializeField] int totalLives = 3;
@@ -55,6 +55,20 @@ public class PlayerController : MonoBehaviourPunCallbacks
 
 			rb.AddRelativeForce(selfBumpForce, ForceMode.Impulse);
 			collision.gameObject.GetComponent<Rigidbody>().AddRelativeForce(otherBumpForce, ForceMode.Impulse);
+		}
+	}
+
+	public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
+	{
+		if (stream.IsWriting)
+		{
+			stream.SendNext(transform.position);
+			stream.SendNext(rb.velocity);
+		}
+		else
+		{
+			transform.position = (Vector3)stream.ReceiveNext();
+			rb.velocity = (Vector3)stream.ReceiveNext();
 		}
 	}
 }
