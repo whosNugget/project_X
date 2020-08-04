@@ -1,11 +1,13 @@
 ﻿using UnityEngine;
 using Photon.Pun;
+using System.Collections;
+using TMPro;
 
 public class RoomController : MonoBehaviourPunCallbacks
 {
 	// player instance prefab, must be located in the Resources folder 
-	[SerializeField] GameObject m_playerPrefab;    // player spawn point  
-	[SerializeField] Transform m_spawnPoint;
+	[SerializeField] GameObject playerPrefab;    // player spawn point  
+	[SerializeField] Transform[] spawnPoints;
 	[SerializeField] bool devMode = false;
 
 	void Start()
@@ -18,8 +20,9 @@ public class RoomController : MonoBehaviourPunCallbacks
 			return;
 		}
 		// spawn a character for the local player. it gets synced by using PhotonNetwork.Instantiate       
-		PhotonNetwork.Instantiate(m_playerPrefab.name, m_spawnPoint.position, Quaternion.identity, 0);
+		PhotonNetwork.Instantiate(playerPrefab.name, spawnPoints[Random.Range(0, spawnPoints.Length)].position, Quaternion.identity, 0);
 	}
+
 	void OnGUI()
 	{
 		if (PhotonNetwork.CurrentRoom == null) return;        // leave this Room   
@@ -35,8 +38,29 @@ public class RoomController : MonoBehaviourPunCallbacks
 			GUI.Label(new Rect(5, 35 + 30 * i, 200, 25), PhotonNetwork.PlayerList[i].NickName + isMasterClient);
 		}
 	}
+
 	public override void OnLeftRoom()
 	{        // left the Room, return back to the GameLobby  
 		UnityEngine.SceneManagement.SceneManager.LoadScene("GameLobby");
+	}
+
+	public void RespawnPlayer(PlayerController toRespawn)
+	{
+		if (toRespawn.lives > 0)
+		{
+			toRespawn.lives--;
+			Transform spawn = spawnPoints[Random.Range(0, spawnPoints.Length)];
+
+			toRespawn.GetComponent<Rigidbody>().isKinematic = true;
+			toRespawn.transform.position = (Vector3.up * 3) + spawn.position;
+			toRespawn.transform.rotation = spawn.rotation;
+
+			StartCoroutine(Countdown(toRespawn));
+		}
+	}
+	IEnumerator Countdown(PlayerController toRespawn)
+	{
+		yield return new WaitForSeconds(3f);
+		toRespawn.GetComponent<Rigidbody>().isKinematic = false;
 	}
 }
