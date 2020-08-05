@@ -27,6 +27,11 @@ public class PlayerController : MonoBehaviourPun, IPunObservable
 			ui = FindObjectOfType<GameUI>();
 	}
 
+	private void Start()
+	{
+		playerName.enabled = !photonView.IsMine;
+	}
+
 	void Update()
 	{
 		if (photonView.IsMine || overrideControl)
@@ -69,7 +74,6 @@ public class PlayerController : MonoBehaviourPun, IPunObservable
 	public void SetPlayerName(string playerName)
 	{
 		this.playerName.text = playerName;
-		this.playerName.enabled = !photonView.IsMine;
 	}
 
 	public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
