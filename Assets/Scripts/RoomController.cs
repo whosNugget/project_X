@@ -20,7 +20,8 @@ public class RoomController : MonoBehaviourPunCallbacks
 			return;
 		}
 		// spawn a character for the local player. it gets synced by using PhotonNetwork.Instantiate       
-		PhotonNetwork.Instantiate(playerPrefab.name, spawnPoints[Random.Range(0, spawnPoints.Length)].position, Quaternion.identity, 0);
+		PlayerController spawnedPlayer = PhotonNetwork.Instantiate(playerPrefab.name, spawnPoints[Random.Range(0, spawnPoints.Length)].position, Quaternion.identity, 0).GetComponent<PlayerController>();
+		spawnedPlayer.SetPlayerName(PhotonNetwork.NickName);
 	}
 
 	void OnGUI()

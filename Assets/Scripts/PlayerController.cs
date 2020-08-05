@@ -1,5 +1,6 @@
 ﻿using Photon.Pun;
 using UnityEngine;
+using TMPro;
 
 public class PlayerController : MonoBehaviourPun, IPunObservable
 {
@@ -14,11 +15,13 @@ public class PlayerController : MonoBehaviourPun, IPunObservable
 
 	GameUI ui = null;
 	Rigidbody rb = null;
+	TMP_Text playerName = null;
 
 	private void Awake()
 	{
 		rb = GetComponent<Rigidbody>();
 		lives = totalLives;
+		playerName = GetComponentInChildren<TMP_Text>();
 
 		if (photonView.IsMine)
 			ui = FindObjectOfType<GameUI>();
@@ -63,16 +66,24 @@ public class PlayerController : MonoBehaviourPun, IPunObservable
 		}
 	}
 
+	public void SetPlayerName(string playerName)
+	{
+		this.playerName.text = playerName;
+		this.playerName.enabled = !photonView.IsMine;
+	}
+
 	public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
 	{
 		if (stream.IsWriting)
 		{
+			stream.SendNext(playerName.text);
 			stream.SendNext(transform.position);
 			stream.SendNext(rb.velocity);
 			stream.SendNext(rb.drag);
 		}
 		else
 		{
+			playerName.text = (string)stream.ReceiveNext();
 			transform.position = (Vector3)stream.ReceiveNext();
 			rb.velocity = (Vector3)stream.ReceiveNext();
 			rb.drag = (float)stream.ReceiveNext();
