@@ -127,7 +127,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   speed: 8
   totalLives: 3
-  bumpForce: 5
+  bumpForce: 10
   selfBumpFactor: 0.35
   overrideControl: 0
   lives: 0
