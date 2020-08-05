@@ -125,7 +125,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ee1507d602a25cf4c86a664fe3280330, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  speed: 15
+  speed: 8
   totalLives: 3
   bumpForce: 5
   selfBumpFactor: 0.35
